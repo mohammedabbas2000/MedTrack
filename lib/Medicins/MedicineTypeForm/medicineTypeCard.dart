@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:medtrack/NewMed/MedicineTypeForm/medicineType.dart';
+import 'package:medtrack/Medicins/MedicineTypeForm/medicineType.dart';
 
 class MedicineTypeCard extends StatelessWidget {
   final MedicineType pillType;

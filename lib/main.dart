@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:medtrack/NewMed/newMed.dart';
+import 'package:medtrack/Medicins/newMed.dart';
 import 'package:medtrack/medications.dart';
 import 'package:medtrack/openPage.dart';
 import 'package:medtrack/register.dart';
