@@ -6,6 +6,8 @@ import 'package:medtrack/openPage.dart';
 import 'package:medtrack/register.dart';
 import 'package:medtrack/homePage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:medtrack/settings.dart';
+import 'package:medtrack/updateSoS.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +32,8 @@ class MyApp extends StatelessWidget {
         'register': (context) => MyRegister(),
         'homepage': (context) => HomePage(),
         'medications': (context) => Medications(),
-        // 'newMedicine': (context) => NewMedicine(),
+        'settings': (context) => Settings(),
+        'updateSOS': (context) => updateSOS(),
         'graphs': (context) => graphs(),
       },
     );

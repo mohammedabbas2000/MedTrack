@@ -347,7 +347,9 @@ class _HomePageState extends State<HomePage> {
                 Icons.person_3_outlined,
                 color: _Colors['blue'],
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, 'settings');
+              },
             ),
           ],
         ),

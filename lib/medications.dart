@@ -9,6 +9,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'model.dart';
 
 class Medications extends StatefulWidget {
   @override
@@ -23,6 +24,7 @@ Map<String, Color> _Colors = {
 
 class _MedicationsState extends State<Medications> {
   List<String> people = ["0502661444"];
+  model model_x = new model();
   var currentLocation;
   late String lat;
   late String long;
@@ -81,6 +83,7 @@ class _MedicationsState extends State<Medications> {
         leading: BackButton(),
         centerTitle: true,
       ),
+      bottomNavigationBar: model_x.buttomAppBar_app(context),
       body: ModalProgressHUD(
         inAsyncCall: showSpinner,
         child: Container(
