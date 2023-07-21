@@ -83,6 +83,87 @@ class _HomePageState extends State<HomePage> {
         showSpinner = false;
       });
     });
+
+    // await FirebaseFirestore.instance
+    //     .collection('medicines')
+    //     .doc(user!.email)
+    //     .collection('dates')
+    //     .get()
+    //     .then((querySnapshot) {
+    //   List<Map<String, dynamic>> dataList = [];
+    //   if (querySnapshot.docs.isNotEmpty) {
+    //     print(querySnapshot);
+    //     querySnapshot.docs.forEach((doc) {
+    //       FirebaseFirestore.instance
+    //           .collection('dates')
+    //           .doc(doc.id)
+    //           .collection('medicinesList')
+    //           .get()
+    //           .then((Snapshot2) {
+    //         print("-------------------------");
+    //         print(doc.id);
+    //         print(Snapshot2.docs);
+    //       });
+
+    //       dataList.add(doc.data());
+    //     });
+    //   } else {
+    //     print("Empty");
+    //   }
+
+    //   print(dataList);
+    //   medInDate = dataList;
+    //   setState(() {
+    //     showSpinner = false;
+    //   });
+    // }).catchError((error) {
+    //   print("Error getting documents: $error");
+    //   setState(() {
+    //     showSpinner = false;
+    //   });
+    // });
+
+    //  try {
+    //   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+    //       .collection('medicines')
+    //       .doc(user!.email)
+    //       .collection('dates')
+    //       .get();
+
+    //   List<Map<String, dynamic>> dataList = [];
+    //   if (querySnapshot.docs.isNotEmpty) {
+    //     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+    //       QuerySnapshot subCollectionSnapshot = await FirebaseFirestore.instance
+    //           .collection('medicines')
+    //           .doc(user!.email)
+    //           .collection('dates')
+    //           .doc(doc.id)
+    //           .collection('medicinesList')
+    //           .get();
+
+    //       List<Map<String, dynamic>> subDataList = [];
+    //       subCollectionSnapshot.docs.forEach((subDoc) {
+
+    //         subDataList.add(subDoc.data());
+    //       });
+
+    //       print('Date: ${doc.id}, Medicines List: $subDataList');
+    //       dataList.addAll(subDataList);
+    //     }
+    //   } else {
+    //     print('No data found in the "dates" subcollection for the user.');
+    //   }
+
+    //   setState(() {
+    //     medInDate = dataList;
+    //     showSpinner = false;
+    //   });
+    // } catch (error) {
+    //   print('Error getting documents: $error');
+    //   setState(() {
+    //     showSpinner = false;
+    //   });
+    // }
   }
 
   @override
@@ -229,7 +310,9 @@ class _HomePageState extends State<HomePage> {
                 Icons.analytics_outlined,
                 color: _Colors['blue'],
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, 'graphs');
+              },
             ),
             SizedBox(
               width: 30,

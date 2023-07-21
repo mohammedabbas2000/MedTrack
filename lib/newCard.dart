@@ -115,7 +115,7 @@ class _newCardState extends State<newCard> {
     if (_tapPosition == null) return;
 
     final RenderBox overlay =
-        Overlay.of(context)!.context.findRenderObject() as RenderBox;
+        Overlay.of(context).context.findRenderObject() as RenderBox;
 
     await showMenu(
       context: context,

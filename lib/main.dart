@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:medtrack/Medicins/newMed.dart';
+// import 'package:medtrack/NewMed/newMed.dart';
+import 'package:medtrack/graphs.dart';
 import 'package:medtrack/medications.dart';
 import 'package:medtrack/openPage.dart';
 import 'package:medtrack/register.dart';
@@ -29,7 +30,8 @@ class MyApp extends StatelessWidget {
         'register': (context) => MyRegister(),
         'homepage': (context) => HomePage(),
         'medications': (context) => Medications(),
-        'newMedicine': (context) => NewMedicine(),
+        // 'newMedicine': (context) => NewMedicine(),
+        'graphs': (context) => graphs(),
       },
     );
   }
