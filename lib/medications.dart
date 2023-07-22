@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sms/flutter_sms.dart';
+import 'package:medtrack/updateSoS.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
@@ -99,15 +100,43 @@ class _MedicationsState extends State<Medications> {
                 Center(
                   child: GestureDetector(
                     onTap: () {
+                      updateSOS.numbers.forEach((key, value) {
+                        print(value.getname() +
+                            '---' +
+                            value.getphone().toString());
+                      });
+                      List<String> numbers = [];
+
+                      updateSOS.numbers.forEach(
+                        (key, value) {
+                          if (value.getphone().toString() != "") {
+                            numbers.add(value.getphone().toString());
+                          }
+                        },
+                      );
+                      print(numbers);
                       _getCurrentLocation();
                       print(lat + '---' + long);
                       setState(() {
                         print(lat + "---" + long);
                       });
-                      sendSMS(
-                          message:
-                              "Emergency! I need help \n https://www.google.com/maps/search/?api=1&query=$lat,$long",
-                          recipients: people);
+                      print(numbers);
+                      if (numbers.isNotEmpty) {
+                        sendSMS(
+                            message:
+                                "Emergency! I need help \n https://www.google.com/maps/search/?api=1&query=$lat,$long",
+                            recipients: numbers);
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text("Error"),
+                                content:
+                                    Text("Error ! No phone numbers found."),
+                              );
+                            });
+                      }
                     },
                     child: Container(
                         decoration: BoxDecoration(
