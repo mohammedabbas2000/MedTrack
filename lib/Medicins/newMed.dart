@@ -441,7 +441,8 @@ class _NewMedicineState extends State<NewMedicine> {
           .collection('dates')
           .doc(DateFormat("dd.MM.yy").format(date))
           .collection('medicinesList')
-          .doc()
+          .doc(
+              '$pillName,${medicineTypes[medicineTypes.indexWhere((element) => element.isChoose == true)].name.toLowerCase()},${DateFormat.Hm().format(setDate)}')
           .set({
         'pillName': pillName,
         'pillAmount': pillAmount,
@@ -451,8 +452,8 @@ class _NewMedicineState extends State<NewMedicine> {
                 medicineTypes.indexWhere((element) => element.isChoose == true)]
             .name
             .toLowerCase(),
-        'medTime': DateFormat.Hm().format(date),
-        'medDate': DateFormat("dd.MM").format(date)
+        'medTime': DateFormat.Hm().format(setDate),
+        'medDate': DateFormat("dd.MM").format(setDate)
       });
 
       setState(() {
@@ -482,7 +483,6 @@ class _NewMedicineState extends State<NewMedicine> {
     }
   }
 
-  Future<void> newMedDate() async {}
   InputDecoration Decoration(String text, dynamic icon) {
     return InputDecoration(
       filled: true,

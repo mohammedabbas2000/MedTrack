@@ -1,14 +1,20 @@
+import 'dart:async';
 import 'dart:ffi';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:medtrack/Medicins/newMed.dart';
 import 'package:medtrack/newCard.dart';
+
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class HomePage extends StatefulWidget {
   @override
@@ -20,12 +26,15 @@ final _auth = FirebaseAuth.instance;
 bool showSpinner = false;
 Map<String, dynamic> dataOfUser = {};
 List<Map<String, dynamic>> medInDate = [];
+List<dynamic> timeEvents = [];
 Map<String, Color> _Colors = {
   "orange": Color.fromARGB(255, 231, 146, 71),
   "blue": Color.fromARGB(255, 92, 107, 192)
 };
 
 class _HomePageState extends State<HomePage> {
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   DateTime selectedDay = DateTime.now();
   DateTime focusedDay = DateTime.now();
 
@@ -35,6 +44,7 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     getDataOfUser();
     getTheMedicines();
+
     super.initState();
   }
 
@@ -68,12 +78,19 @@ class _HomePageState extends State<HomePage> {
         .get()
         .then((querySnapshot) {
       List<Map<String, dynamic>> dataList = [];
+      List<String> Events = [];
+      Events.add(DateFormat("dd.MM.yy").format(selectedDay));
       querySnapshot.docs.forEach((doc) {
         dataList.add(doc.data());
+        Events.add(doc.data()['medTime'].toString());
       });
-
+      dataList.sort((a, b) => a["medTime"].compareTo(b["medTime"]));
       print(dataList);
+      print(timeEvents);
       medInDate = dataList;
+      timeEvents = Events;
+      startTimerFromMinute(scheduleReminder);
+
       setState(() {
         showSpinner = false;
       });
@@ -83,87 +100,6 @@ class _HomePageState extends State<HomePage> {
         showSpinner = false;
       });
     });
-
-    // await FirebaseFirestore.instance
-    //     .collection('medicines')
-    //     .doc(user!.email)
-    //     .collection('dates')
-    //     .get()
-    //     .then((querySnapshot) {
-    //   List<Map<String, dynamic>> dataList = [];
-    //   if (querySnapshot.docs.isNotEmpty) {
-    //     print(querySnapshot);
-    //     querySnapshot.docs.forEach((doc) {
-    //       FirebaseFirestore.instance
-    //           .collection('dates')
-    //           .doc(doc.id)
-    //           .collection('medicinesList')
-    //           .get()
-    //           .then((Snapshot2) {
-    //         print("-------------------------");
-    //         print(doc.id);
-    //         print(Snapshot2.docs);
-    //       });
-
-    //       dataList.add(doc.data());
-    //     });
-    //   } else {
-    //     print("Empty");
-    //   }
-
-    //   print(dataList);
-    //   medInDate = dataList;
-    //   setState(() {
-    //     showSpinner = false;
-    //   });
-    // }).catchError((error) {
-    //   print("Error getting documents: $error");
-    //   setState(() {
-    //     showSpinner = false;
-    //   });
-    // });
-
-    //  try {
-    //   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-    //       .collection('medicines')
-    //       .doc(user!.email)
-    //       .collection('dates')
-    //       .get();
-
-    //   List<Map<String, dynamic>> dataList = [];
-    //   if (querySnapshot.docs.isNotEmpty) {
-    //     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-    //       QuerySnapshot subCollectionSnapshot = await FirebaseFirestore.instance
-    //           .collection('medicines')
-    //           .doc(user!.email)
-    //           .collection('dates')
-    //           .doc(doc.id)
-    //           .collection('medicinesList')
-    //           .get();
-
-    //       List<Map<String, dynamic>> subDataList = [];
-    //       subCollectionSnapshot.docs.forEach((subDoc) {
-
-    //         subDataList.add(subDoc.data());
-    //       });
-
-    //       print('Date: ${doc.id}, Medicines List: $subDataList');
-    //       dataList.addAll(subDataList);
-    //     }
-    //   } else {
-    //     print('No data found in the "dates" subcollection for the user.');
-    //   }
-
-    //   setState(() {
-    //     medInDate = dataList;
-    //     showSpinner = false;
-    //   });
-    // } catch (error) {
-    //   print('Error getting documents: $error');
-    //   setState(() {
-    //     showSpinner = false;
-    //   });
-    // }
   }
 
   @override
@@ -269,12 +205,21 @@ class _HomePageState extends State<HomePage> {
                     ? noPill(context)
                     : Expanded(
                         child: ListView.separated(
+                          shrinkWrap: true,
                           padding: const EdgeInsets.all(8),
                           itemCount: medInDate.length,
                           itemBuilder: (BuildContext context, int index) {
+                            Future<void> isDelete(String isDelete) async {
+                              print(isDelete);
+                              if (isDelete == 'refresh') {
+                                await getTheMedicines();
+                              }
+                            }
+
                             Map<String, dynamic> medicineData =
                                 medInDate[index];
-                            return newCard(dataOfUser, medInDate[index]);
+                            return newCard(
+                                dataOfUser, medInDate[index], isDelete);
                           },
                           separatorBuilder: (BuildContext context, int index) =>
                               const Divider(),
@@ -323,7 +268,9 @@ class _HomePageState extends State<HomePage> {
                 Icons.history,
                 color: _Colors['blue'],
               ),
-              onPressed: () {},
+              onPressed: () {
+                scheduleReminder();
+              },
             ),
             SizedBox(
               width: 30,
@@ -434,5 +381,81 @@ class _HomePageState extends State<HomePage> {
       selectedDay = _selectedDay;
     });
     await getTheMedicines();
+  }
+
+  void startTimerFromMinute(Function() callback) {
+    DateTime now = DateTime.now();
+    int secondsUntilNextMinute = 60 -
+        now.second; // Calculate the remaining seconds until the next minute
+    Timer(Duration(seconds: secondsUntilNextMinute), () {
+      // This code will run exactly on the next minute
+      callback();
+      Timer.periodic(Duration(seconds: 60), (_) {
+        // This code will run every 60 seconds, starting from the next minute
+        callback();
+      });
+    });
+  }
+
+  void scheduleReminder() {
+    DateTime now = DateTime.now();
+    print(timeEvents.length);
+    if (DateFormat("dd.MM.yy").format(now).toString() == timeEvents[0]) {
+      for (int i = 1; i < timeEvents.length; i++) {
+        String eventTime = timeEvents[i];
+        List<String> timeParts = eventTime.split(':');
+
+        int hour = int.parse(timeParts[0]);
+        int minute = int.parse(timeParts[1]);
+        if (now.hour == hour && now.minute == minute) {
+          String notificationTitle = "Reminder";
+          String notificationBody = "Don't forget the medicines event!";
+          DateTime scheduledTime =
+              DateTime(now.year, now.month, now.day, hour, minute)
+                  .add(Duration(seconds: 3));
+          print(scheduledTime);
+          scheduleNotification(
+              scheduledTime, notificationTitle, notificationBody);
+        }
+      }
+    }
+  }
+
+  void scheduleNotification(DateTime scheduledTime, String notificationTitle,
+      String notificationBody) async {
+    try {
+      final int notificationId = 0; // Unique ID for the notification
+      tz.initializeTimeZones(); // Initialize time zone data
+      tz.setLocalLocation(tz.getLocation(
+          'Asia/Jerusalem')); // Replace 'YOUR_TIME_ZONE_HERE' with the desired time zone, e.g., 'America/New_York'
+      const AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails(
+        'reminder_channel_id',
+        'Reminder Channel',
+        channelDescription: 'Channel for Reminder Notifications',
+        importance: Importance.high,
+        priority: Priority.high,
+      );
+
+      const NotificationDetails platformChannelSpecifics =
+          NotificationDetails(android: androidPlatformChannelSpecifics);
+      tz.TZDateTime scheduledDateTime =
+          tz.TZDateTime.from(scheduledTime, tz.local);
+      print("Scheduled DateTime: $scheduledDateTime");
+      await FlutterLocalNotificationsPlugin().zonedSchedule(
+        notificationId,
+        notificationTitle,
+        notificationBody,
+        scheduledDateTime,
+        platformChannelSpecifics,
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+      print("Notification Scheduled successfully!");
+    } catch (e) {
+      print("Error scheduling notification: $e");
+    }
   }
 }

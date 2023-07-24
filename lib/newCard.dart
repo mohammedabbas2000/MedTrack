@@ -1,10 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
+import 'package:medtrack/yes_noDialog.dart';
+import 'package:medtrack/openPage.dart';
 
 class newCard extends StatefulWidget {
   var dataOfUser;
   var dataOfPill;
-  newCard(this.dataOfUser, this.dataOfPill);
+  final Function(String) isDelete;
+  newCard(this.dataOfUser, this.dataOfPill, this.isDelete, {super.key});
   Map<String, Color> _Colors = {
     "orange": Color.fromARGB(255, 231, 146, 71),
     "blue": Color.fromARGB(255, 92, 107, 192)
@@ -13,6 +19,10 @@ class newCard extends StatefulWidget {
   @override
   State<newCard> createState() => _newCardState();
 }
+
+final _firestore = FirebaseFirestore.instance;
+final _auth = FirebaseAuth.instance;
+User? user = _auth.currentUser;
 
 class _newCardState extends State<newCard> {
   Offset? _tapPosition;
@@ -127,7 +137,8 @@ class _newCardState extends State<newCard> {
         Offset.zero & overlay.size,
       ),
       items: [
-        PopupMenuItem(
+        const PopupMenuItem(
+          value: 'delete',
           child: Text(
             'Delete',
             style: TextStyle(
@@ -137,30 +148,95 @@ class _newCardState extends State<newCard> {
                   FontWeight.bold, // Customize the font weight for "Delete"
             ),
           ),
-          value: 'delete',
         ),
-        PopupMenuItem(
+        const PopupMenuItem(
+          value: 'deleteAll',
           child: Text(
-            'Update',
+            'Delete All',
             style: TextStyle(
-              color: Colors.green, // Customize the text color for "Update"
-              fontSize: 16.0, // Customize the font size for "Update"
+              color: Colors.red, // Customize the text color for "Delete"
+              fontSize: 16.0, // Customize the font size for "Delete"
               fontWeight:
-                  FontWeight.bold, // Customize the font weight for "Update"
+                  FontWeight.bold, // Customize the font weight for "Delete"
             ),
           ),
-          value: 'update',
         ),
       ],
       elevation: 8.0,
-    ).then((value) {
+    ).then((value) async {
       if (value == 'delete') {
         // Handle delete action
+        showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => const YesNoDialog(
+                  text: 'Are you sure that need to delete this medicine',
+                  type: "question",
+                )).then((value) async {
+          if (value == 'yes') {
+            await deleteOne();
+            widget.isDelete('refresh');
+          }
+        });
+
         print('Delete option selected');
-      } else if (value == 'update') {
-        // Handle update action
-        print('Update option selected');
+      } else if (value == 'deleteAll') {
+        showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => const YesNoDialog(
+                  text: 'Are you sure that need to delete this medicine',
+                  type: "question",
+                )).then((value) async {
+          if (value == 'yes') {
+            await deleteAll();
+            widget.isDelete('refresh');
+          }
+        });
       }
     });
+  }
+
+  Future<void> deleteAll() async {
+    try {
+      String medicinesId =
+          '${widget.dataOfPill['pillName']},${widget.dataOfPill['medForm']},${widget.dataOfPill['medTime']}';
+      DateTime today = DateTime.now();
+      DateTime twoWeeksAfterToday = today.add(Duration(days: 14));
+
+      for (DateTime date = today;
+          date.isBefore(twoWeeksAfterToday);
+          date = date.add(Duration(days: 1))) {
+        await FirebaseFirestore.instance
+            .collection('medicines')
+            .doc(user!.email)
+            .collection('dates')
+            .doc(DateFormat("dd.MM.yy").format(date))
+            .collection('medicinesList')
+            .doc(medicinesId)
+            .delete();
+      }
+    } catch (error) {
+      print("Error deleting documents: $error");
+    }
+  }
+
+  Future<void> deleteOne() async {
+    try {
+      String medicinesId =
+          '${widget.dataOfPill['pillName']},${widget.dataOfPill['medForm']},${widget.dataOfPill['medTime']}';
+      DateTime today = DateTime.now();
+      DateTime twoWeeksAfterToday = today.add(Duration(days: 14));
+      print(widget.dataOfPill['medDate'] + '.23');
+      print(medicinesId);
+      await FirebaseFirestore.instance
+          .collection('medicines')
+          .doc(user!.email)
+          .collection('dates')
+          .doc(widget.dataOfPill['medDate'] + '.23')
+          .collection('medicinesList')
+          .doc(medicinesId)
+          .delete();
+    } catch (error) {
+      print("Error deleting documents: $error");
+    }
   }
 }

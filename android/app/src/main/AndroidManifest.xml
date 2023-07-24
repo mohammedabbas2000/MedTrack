@@ -2,6 +2,10 @@
     package="com.example.medtrack">
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
    <application
         android:label="medtrack"
         android:name="${applicationName}"
@@ -20,7 +24,7 @@
                  to determine the Window background behind the Flutter UI. -->
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
-              android:resource="@style/NormalTheme"
+              android:resource="@drawable/ic_launcher"
               />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-// import 'package:medtrack/NewMed/newMed.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:medtrack/Medicins/newMed.dart';
 import 'package:medtrack/graphs.dart';
 import 'package:medtrack/medications.dart';
 import 'package:medtrack/openPage.dart';
@@ -13,11 +14,28 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp();
+    WidgetsFlutterBinding.ensureInitialized();
+    await initializeNotifications();
   } catch (e) {
-    print("mohammed $e");
+    print(e);
   }
 
   runApp(MyApp());
+}
+
+Future<void> initializeNotifications() async {
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@drawable/ic_launcher');
+  final InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+  await FlutterLocalNotificationsPlugin().initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: (payload) async {
+      // This callback is triggered when the user taps on the notification
+      print("User tapped on the notification!");
+    },
+  );
 }
 
 class MyApp extends StatelessWidget {
