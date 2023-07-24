@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:medtrack/Medicins/newMed.dart';
+import 'package:medtrack/graphs.dart';
 import 'package:medtrack/newCard.dart';
 
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -25,6 +26,9 @@ final _firestore = FirebaseFirestore.instance;
 final _auth = FirebaseAuth.instance;
 bool showSpinner = false;
 Map<String, dynamic> dataOfUser = {};
+Map<String, dynamic> dataOfMed = {};
+List<Map<String, dynamic>> meds = [];
+
 List<Map<String, dynamic>> medInDate = [];
 List<dynamic> timeEvents = [];
 Map<String, Color> _Colors = {
@@ -44,7 +48,7 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     getDataOfUser();
     getTheMedicines();
-
+    getTheMedicinesData(); //////////////test
     super.initState();
   }
 
@@ -100,6 +104,40 @@ class _HomePageState extends State<HomePage> {
         showSpinner = false;
       });
     });
+  }
+
+  Future<void> getTheMedicinesData() async {
+    setState(() {
+      showSpinner = true;
+    });
+    DateTime today = DateTime.now();
+    DateTime twoWeeksAfterToday = today.add(Duration(days: 14));
+    for (DateTime date = today;
+        date.isBefore(twoWeeksAfterToday);
+        date = date.add(Duration(days: 1))) {
+      await FirebaseFirestore.instance
+          .collection('medicines')
+          .doc(user!.email)
+          .collection('dates')
+          .doc(DateFormat("dd.MM.yy").format(selectedDay))
+          .collection('medicinesList')
+          .get()
+          .then((querySnapshot) {
+        setState(() {
+          meds = [];
+          querySnapshot.docs.forEach((element) {
+            print(element.data());
+            meds.add(element.data());
+          });
+          showSpinner = false;
+        });
+      }).catchError((error) {
+        print("Error getting documents: $error");
+        setState(() {
+          showSpinner = false;
+        });
+      });
+    }
   }
 
   @override
@@ -256,7 +294,15 @@ class _HomePageState extends State<HomePage> {
                 color: _Colors['blue'],
               ),
               onPressed: () {
-                Navigator.pushNamed(context, 'graphs');
+                //Navigator.pushNamed(context, 'graphs');
+                getTheMedicinesData();
+                print("////////////////////---------------");
+                print(meds);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => graphs(meds),
+                    ));
               },
             ),
             SizedBox(

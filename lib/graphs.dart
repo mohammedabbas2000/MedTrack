@@ -8,7 +8,9 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:http/http.dart' as http;
 
 class graphs extends StatefulWidget {
+  final meds;
   @override
+  graphs(this.meds);
   State<graphs> createState() => _graphsState();
 }
 
@@ -50,7 +52,7 @@ class _graphsState extends State<graphs> {
         child: Container(
             height: 1000,
             child: Column(
-              children: [],
+              children: [Text(widget.meds.toString())],
             )),
       ),
     );
