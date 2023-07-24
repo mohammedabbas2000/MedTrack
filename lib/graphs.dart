@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class graphs extends StatefulWidget {
   final meds;
@@ -28,32 +30,252 @@ class _graphsState extends State<graphs> {
     super.initState();
   }
 
+  List count_of_med() {
+    widget.meds;
+    return [];
+  }
+
+  final List<double> barChartData = [5, 10, 8, 12, 6, 15];
+  final List<PieChartSectionData> pieChartData = [
+    PieChartSectionData(
+      value: 30,
+      color: Colors.red,
+      title: '30%',
+      radius: 30,
+      titleStyle: TextStyle(
+          fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+    ),
+    PieChartSectionData(
+      value: 40,
+      color: Colors.green,
+      title: '40%',
+      radius: 30,
+      titleStyle: TextStyle(
+          fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+    ),
+    PieChartSectionData(
+      value: 30,
+      color: Colors.blue,
+      title: '30%',
+      radius: 30,
+      titleStyle: TextStyle(
+          fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
-        backgroundColor: _Colors['orange'],
-        automaticallyImplyLeading: false,
-        title: Text(
-          'Medication analytics',
-          style: TextStyle(
-            color: Color.fromARGB(255, 255, 255, 255),
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: BackButton(),
-        actions: [],
-        centerTitle: true,
+        title: Text('Combined Charts Example'),
       ),
-      body: ModalProgressHUD(
-        inAsyncCall: showSpinner,
-        child: Container(
-            height: 1000,
-            child: Column(
-              children: [Text(widget.meds.toString())],
-            )),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(widget.meds.toString()),
+            Expanded(
+              flex: 1,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: 20,
+                  barTouchData: BarTouchData(enabled: false),
+                  titlesData: FlTitlesData(
+                    leftTitles: SideTitles(
+                      showTitles: true,
+                      getTextStyles: (value) =>
+                          const TextStyle(color: Colors.blueGrey, fontSize: 10),
+                      getTitles: (value) {
+                        return value.toInt().toString();
+                      },
+                      margin: 8,
+                      reservedSize: 30,
+                    ),
+                    bottomTitles: SideTitles(
+                      showTitles: true,
+                      getTextStyles: (value) =>
+                          const TextStyle(color: Colors.blueGrey, fontSize: 10),
+                      getTitles: (value) {
+                        switch (value.toInt()) {
+                          case 0:
+                            return 'A';
+                          case 1:
+                            return 'B';
+                          case 2:
+                            return 'C';
+                          case 3:
+                            return 'D';
+                          case 4:
+                            return 'E';
+                          case 5:
+                            return 'F';
+                          default:
+                            return '';
+                        }
+                      },
+                    ),
+                  ),
+                  gridData: FlGridData(show: false),
+                  borderData: FlBorderData(show: false),
+                  barGroups: barChartData
+                      .asMap()
+                      .map(
+                        (index, value) => MapEntry(
+                          index,
+                          BarChartGroupData(
+                            x: index,
+                            barRods: [
+                              BarChartRodData(
+                                y: value,
+                                colors: [Colors.blue],
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                      .values
+                      .toList(),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: PieChart(
+                PieChartData(
+                  sections: pieChartData,
+                  borderData: FlBorderData(show: false),
+                  centerSpaceRadius: 30,
+                  sectionsSpace: 0,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CombinedChartsExample extends StatelessWidget {
+  final List<double> barChartData = [5, 10, 8, 12, 6, 15];
+  final List<PieChartSectionData> pieChartData = [
+    PieChartSectionData(
+      value: 30,
+      color: Colors.red,
+      title: '30%',
+      radius: 30,
+      titleStyle: TextStyle(
+          fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+    ),
+    PieChartSectionData(
+      value: 40,
+      color: Colors.green,
+      title: '40%',
+      radius: 30,
+      titleStyle: TextStyle(
+          fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+    ),
+    PieChartSectionData(
+      value: 30,
+      color: Colors.blue,
+      title: '30%',
+      radius: 30,
+      titleStyle: TextStyle(
+          fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Combined Charts Example'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: 20,
+                  barTouchData: BarTouchData(enabled: false),
+                  titlesData: FlTitlesData(
+                    leftTitles: SideTitles(
+                      showTitles: true,
+                      getTextStyles: (value) =>
+                          const TextStyle(color: Colors.blueGrey, fontSize: 10),
+                      getTitles: (value) {
+                        return value.toInt().toString();
+                      },
+                      margin: 8,
+                      reservedSize: 30,
+                    ),
+                    bottomTitles: SideTitles(
+                      showTitles: true,
+                      getTextStyles: (value) =>
+                          const TextStyle(color: Colors.blueGrey, fontSize: 10),
+                      getTitles: (value) {
+                        switch (value.toInt()) {
+                          case 0:
+                            return 'A';
+                          case 1:
+                            return 'B';
+                          case 2:
+                            return 'C';
+                          case 3:
+                            return 'D';
+                          case 4:
+                            return 'E';
+                          case 5:
+                            return 'F';
+                          default:
+                            return '';
+                        }
+                      },
+                    ),
+                  ),
+                  gridData: FlGridData(show: false),
+                  borderData: FlBorderData(show: false),
+                  barGroups: barChartData
+                      .asMap()
+                      .map(
+                        (index, value) => MapEntry(
+                          index,
+                          BarChartGroupData(
+                            x: index,
+                            barRods: [
+                              BarChartRodData(
+                                y: value,
+                                colors: [Colors.blue],
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                      .values
+                      .toList(),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: PieChart(
+                PieChartData(
+                  sections: pieChartData,
+                  borderData: FlBorderData(show: false),
+                  centerSpaceRadius: 30,
+                  sectionsSpace: 0,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

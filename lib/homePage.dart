@@ -177,7 +177,6 @@ class _HomePageState extends State<HomePage> {
                       await getTheMedicines();
                     }
                   });
-                  ;
                 },
               ),
             ],
@@ -268,7 +267,17 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: _Colors['orange'],
-        onPressed: () async {},
+        onPressed: () async {
+          showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) => NewMedicine())
+              .then((result) async {
+            if (result != null && result == 'refresh') {
+              // The dialog returned a 'refresh' result, call the function to get the medicines.
+              await getTheMedicines();
+            }
+          });
+        },
         child: Icon(
           Icons.add,
           size: 30,

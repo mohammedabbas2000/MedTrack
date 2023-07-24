@@ -89,7 +89,7 @@ class _newCardState extends State<newCard> {
                                 ),
                               ),
                               Text(
-                                '20 ${widget.dataOfPill['pillType']}, Take ${widget.dataOfPill['pillAmount']}',
+                                '  Take ${widget.dataOfPill['pillAmount']} ${widget.dataOfPill['pillType']}',
                                 style: TextStyle(
                                   fontSize: 14.0,
                                   fontWeight: FontWeight.bold,

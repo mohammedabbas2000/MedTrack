@@ -28,7 +28,7 @@ String pillType = '';
 int pillWeek = 1;
 String medForm = '';
 
-final List<String> weightValues = ["pills", "ml", "mg"];
+final List<String> weightValues = ["ml", "mg"];
 var _currentSliderValue = 2;
 DateTime setDate = DateTime.now();
 final List<MedicineType> medicineTypes = [
@@ -73,7 +73,7 @@ class _NewMedicineState extends State<NewMedicine> {
               ],
             )),
         height: MediaQuery.of(context).size.height * 0.73,
-        width: MediaQuery.of(context).size.width * 0.8,
+        width: MediaQuery.of(context).size.width * 0.85,
         child: SingleChildScrollView(
           child: ModalProgressHUD(
             inAsyncCall: showSpinner,
@@ -96,28 +96,30 @@ class _NewMedicineState extends State<NewMedicine> {
                   const SizedBox(
                     height: 25.0,
                   ),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.7,
-                    child: TextFormField(
-                      textInputAction: TextInputAction.next,
-                      onChanged: (value) {
-                        pillName = value;
-                      },
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          setState(() {
-                            showSpinner = false;
-                          });
-                          return 'Please Enter ${medicineTypes[medicineTypes.indexWhere((element) => element.isChoose == true)].name} Name.';
-                        } else {
-                          return null;
-                        }
-                      },
-                      decoration: Decoration(
-                        "${medicineTypes[medicineTypes.indexWhere((element) => element.isChoose == true)].name} Name",
-                        Icon(
-                          Icons.medication_liquid_sharp,
-                          color: Color.fromARGB(255, 0, 0, 0),
+                  Flexible(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      child: TextFormField(
+                        textInputAction: TextInputAction.next,
+                        onChanged: (value) {
+                          pillName = value;
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            setState(() {
+                              showSpinner = false;
+                            });
+                            return 'Please Enter ${medicineTypes[medicineTypes.indexWhere((element) => element.isChoose == true)].name} Name.';
+                          } else {
+                            return null;
+                          }
+                        },
+                        decoration: Decoration(
+                          "${medicineTypes[medicineTypes.indexWhere((element) => element.isChoose == true)].name} Name",
+                          Icon(
+                            Icons.medication_liquid_sharp,
+                            color: Color.fromARGB(255, 0, 0, 0),
+                          ),
                         ),
                       ),
                     ),
@@ -129,27 +131,29 @@ class _NewMedicineState extends State<NewMedicine> {
                     width: MediaQuery.of(context).size.width * 0.7,
                     child: Row(
                       children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.45,
-                          child: TextFormField(
-                            keyboardType: TextInputType.number,
-                            textInputAction: TextInputAction.next,
-                            onChanged: (value) {
-                              pillAmount = value;
-                            },
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                setState(() {
-                                  showSpinner = false;
-                                });
-                                return 'Please Enter ${medicineTypes[medicineTypes.indexWhere((element) => element.isChoose == true)].name} Amount.';
-                              } else {
-                                return null;
-                              }
-                            },
-                            decoration: Decoration(
-                              "${medicineTypes[medicineTypes.indexWhere((element) => element.isChoose == true)].name} Amount",
-                              null,
+                        Flexible(
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.45,
+                            child: TextFormField(
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.next,
+                              onChanged: (value) {
+                                pillAmount = value;
+                              },
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  setState(() {
+                                    showSpinner = false;
+                                  });
+                                  return 'Please Enter ${medicineTypes[medicineTypes.indexWhere((element) => element.isChoose == true)].name} Amount.';
+                                } else {
+                                  return null;
+                                }
+                              },
+                              decoration: Decoration(
+                                "${medicineTypes[medicineTypes.indexWhere((element) => element.isChoose == true)].name} Amount",
+                                null,
+                              ),
                             ),
                           ),
                         ),
@@ -157,7 +161,7 @@ class _NewMedicineState extends State<NewMedicine> {
                           width: 8.0,
                         ),
                         Container(
-                          width: MediaQuery.of(context).size.width * 0.23,
+                          width: MediaQuery.of(context).size.width * 0.3,
                           child: DropdownButtonFormField(
                             validator: (value) {
                               if (value!.isEmpty) {
@@ -292,10 +296,13 @@ class _NewMedicineState extends State<NewMedicine> {
                                           fontWeight: FontWeight.w500),
                                     ),
                                     const SizedBox(width: 5),
-                                    Icon(
-                                      Icons.access_time,
-                                      size: 30,
-                                      color: Color.fromARGB(255, 231, 146, 71),
+                                    Flexible(
+                                      child: Icon(
+                                        Icons.access_time,
+                                        size: 30,
+                                        color:
+                                            Color.fromARGB(255, 231, 146, 71),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -324,10 +331,13 @@ class _NewMedicineState extends State<NewMedicine> {
                                           fontWeight: FontWeight.w500),
                                     ),
                                     const SizedBox(width: 5),
-                                    Icon(
-                                      Icons.event,
-                                      size: 30,
-                                      color: Color.fromARGB(255, 231, 146, 71),
+                                    Flexible(
+                                      child: Icon(
+                                        Icons.event,
+                                        size: 30,
+                                        color:
+                                            Color.fromARGB(255, 231, 146, 71),
+                                      ),
                                     ),
                                   ],
                                 ),
