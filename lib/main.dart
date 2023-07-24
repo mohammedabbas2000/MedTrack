@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
         'medications': (context) => Medications(),
         'settings': (context) => Settings(),
         'updateSOS': (context) => updateSOS(),
-       // 'graphs': (context) => graphs(),
+        'graphs': (context) => graphs(),
       },
     );
   }

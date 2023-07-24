@@ -303,15 +303,15 @@ class _HomePageState extends State<HomePage> {
                 color: _Colors['blue'],
               ),
               onPressed: () {
-                //Navigator.pushNamed(context, 'graphs');
-                getTheMedicinesData();
+                Navigator.pushNamed(context, 'graphs');
+                // getTheMedicinesData();
                 print("////////////////////---------------");
                 print(meds);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => graphs(meds),
-                    ));
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //       builder: (context) => graphs(meds),
+                //     ));
               },
             ),
             SizedBox(

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:medtrack/homePage.dart';
 import 'package:medtrack/yes_noDialog.dart';
 import 'package:medtrack/openPage.dart';
 
@@ -26,6 +27,7 @@ User? user = _auth.currentUser;
 
 class _newCardState extends State<newCard> {
   Offset? _tapPosition;
+  bool taked = false;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -45,73 +47,122 @@ class _newCardState extends State<newCard> {
             ),
           ),
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.0),
-                border: Border.all(
-                  color: Colors.black12, // Border color
-                  width: 1.0, // Border width
-                ),
-                gradient: LinearGradient(
-                  colors: [
-                    Color.fromARGB(255, 255, 255, 255), // First color
-                    Color.fromARGB(255, 231, 146, 71), // Second color
-                  ],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-              ),
+            child: GestureDetector(
+              onDoubleTap: () {
+                setState(() {
+                  if (taked == true) {
+                    print(widget.dataOfPill);
+                    taked = false;
+                    Map<String, dynamic> data = {
+                      'medTime': widget.dataOfPill['medTime'],
+                      'pillName': widget.dataOfPill['pillName'],
+                      'medForm': widget.dataOfPill['medForm'],
+                      'pillAmount': widget.dataOfPill['pillAmount'].toString(),
+                      'pillType': widget.dataOfPill['pillType'].toString(),
+                      'pillWeek': widget.dataOfPill['pillWeek'].toString(),
+                      'medDate': widget.dataOfPill['medDate'].toString(),
+                      'taked': taked
+                    };
+
+                    _firestore
+                        .collection("Taked")
+                        .doc(widget.dataOfPill['medTime'].toString() +
+                            "-" +
+                            widget.dataOfPill['medDate'].toString())
+                        .set(data);
+                  } else {
+                    taked = true;
+
+                    Map<String, dynamic> data = {
+                      'medTime': widget.dataOfPill['medTime'],
+                      'pillName': widget.dataOfPill['pillName'],
+                      'medForm': widget.dataOfPill['medForm'],
+                      'pillAmount': widget.dataOfPill['pillAmount'].toString(),
+                      'pillType': widget.dataOfPill['pillType'].toString(),
+                      'pillWeek': widget.dataOfPill['pillWeek'].toString(),
+                      'medDate': widget.dataOfPill['medDate'].toString(),
+                      'taked': taked
+                    };
+
+                    _firestore
+                        .collection("Taked")
+                        .doc(widget.dataOfPill['medTime'].toString() +
+                            "-" +
+                            widget.dataOfPill['medDate'].toString())
+                        .set(data);
+                  }
+                });
+              },
               child: Container(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    GestureDetector(
-                      child: ListTile(
-                        leading: Image.asset(
-                          "assets/images/${widget.dataOfPill['medForm']}.png",
-                          fit: BoxFit.cover,
-                          width: 55.0,
-                        ),
-                        title: Container(
-                          padding: EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                widget.dataOfPill['pillName']
-                                    .toString()
-                                    .toUpperCase(),
-                                style: TextStyle(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.bold,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15.0),
+                  border: Border.all(
+                    color: Colors.black12, // Border color
+                    width: 1.0, // Border width
+                  ),
+                  gradient: LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 255, 255, 255), // First color
+                      !taked
+                          ? Color.fromARGB(255, 231, 146, 71)
+                          : Colors.cyan, // Second color
+                    ],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ),
+                child: Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      GestureDetector(
+                        child: ListTile(
+                          leading: Image.asset(
+                            "assets/images/${widget.dataOfPill['medForm']}.png",
+                            fit: BoxFit.cover,
+                            width: 55.0,
+                          ),
+                          title: Container(
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  widget.dataOfPill['pillName']
+                                      .toString()
+                                      .toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                '  Take ${widget.dataOfPill['pillAmount']} ${widget.dataOfPill['pillType']}',
-                                style: TextStyle(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(255, 87, 87,
-                                      87), // Set the desired text color for the subtitle
+                                Text(
+                                  '  Take ${widget.dataOfPill['pillAmount']} ${widget.dataOfPill['pillType']}',
+                                  style: TextStyle(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color.fromARGB(255, 87, 87,
+                                        87), // Set the desired text color for the subtitle
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
+                        onTapDown: (details) {
+                          // Store the tap position when tapped
+                          setState(() {
+                            _tapPosition = details.globalPosition;
+                          });
+                        },
+                        onLongPress: () {
+                          _showPopupMenu(context);
+                        },
                       ),
-                      onTapDown: (details) {
-                        // Store the tap position when tapped
-                        setState(() {
-                          _tapPosition = details.globalPosition;
-                        });
-                      },
-                      onLongPress: () {
-                        _showPopupMenu(context);
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
