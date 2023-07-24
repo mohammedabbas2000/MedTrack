@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:medtrack/Medicins/newMed.dart';
 import 'package:medtrack/graphs.dart';
+import 'package:medtrack/history.dart';
 import 'package:medtrack/medications.dart';
 import 'package:medtrack/openPage.dart';
 import 'package:medtrack/register.dart';
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
         'settings': (context) => Settings(),
         'updateSOS': (context) => updateSOS(),
         'graphs': (context) => graphs(),
+        'history': (context) => History()
       },
     );
   }
