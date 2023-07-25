@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:ffi';
 //import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:medtrack/model.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -33,38 +35,131 @@ class _graphsState extends State<graphs> {
     super.initState();
   }
 
-  final List<PieChartSectionData> pieChartData = [
-    PieChartSectionData(
-      value: 30,
-      color: Colors.red,
-      title: '30%',
-      radius: 30,
-      titleStyle: TextStyle(
-          fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-    ),
-    PieChartSectionData(
-      value: 40,
-      color: Colors.green,
-      title: '40%',
-      radius: 30,
-      titleStyle: TextStyle(
-          fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-    ),
-    PieChartSectionData(
-      value: 30,
-      color: Colors.blue,
-      title: '30%',
-      radius: 30,
-      titleStyle: TextStyle(
-          fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-    ),
-  ];
+  Map<String, double> get_right_data_plus_sum(List list) {
+    Map<String, double> sumByPillName = {};
 
+    // Calculate the sum of pillAmount for each pillName
+    for (var medicine in list) {
+      String pillName = medicine['pillName'];
+      double pillAmount = double.parse(medicine['pillAmount']);
+
+      if (sumByPillName.containsKey(pillName)) {
+        double temp = sumByPillName[pillName] as double;
+        sumByPillName[pillName] = pillAmount + temp;
+      } else {
+        sumByPillName[pillName] = pillAmount;
+      }
+    }
+
+    return sumByPillName;
+  }
+
+  Widget virtical_chart(Map MED, List<double> barChartData) {
+    return BarChart(
+      BarChartData(
+        alignment: BarChartAlignment.spaceAround,
+        maxY: 1000,
+        barTouchData: BarTouchData(enabled: false),
+        titlesData: FlTitlesData(
+          leftTitles: SideTitles(
+            showTitles: true,
+            getTextStyles: (value) =>
+                const TextStyle(color: Colors.blueGrey, fontSize: 10),
+            getTitles: (value) {
+              return value.toInt().toString();
+            },
+            margin: 8,
+            reservedSize: 30,
+          ),
+          bottomTitles: SideTitles(
+            showTitles: true,
+            getTextStyles: (value) =>
+                const TextStyle(color: Colors.blueGrey, fontSize: 10),
+            getTitles: (value) {
+              final List<String> barChartData_ml_pillname =
+                  MED.keys.toList() as List<String>;
+
+              for (int i = 0; i < barChartData_ml_pillname.length; i++) {
+                if (value.toInt() == i) {
+                  return barChartData_ml_pillname[i];
+                }
+              }
+
+              return "";
+            },
+          ),
+        ),
+        gridData: FlGridData(show: false),
+        borderData: FlBorderData(show: false),
+        barGroups: barChartData
+            .asMap()
+            .map(
+              (index, value) => MapEntry(
+                index,
+                BarChartGroupData(
+                  x: index,
+                  barRods: [
+                    BarChartRodData(
+                      y: value,
+                      colors: [Colors.blue],
+                    ),
+                  ],
+                ),
+              ),
+            )
+            .values
+            .toList(),
+      ),
+    );
+  }
+
+  List<PieChartSectionData> bie_data_func(Map MED) {
+    final List<PieChartSectionData> bie_data = [];
+    List<Color> primaryColors = [
+      Colors.red,
+      Colors.blue,
+      Colors.green,
+      Colors.yellow,
+      Colors.orange,
+      Colors.purple,
+      Colors.teal,
+      Colors.pink,
+      Colors.cyan,
+      Colors.amber,
+      Colors.indigo,
+    ];
+    int color_indx = 0;
+    MED.forEach(
+      (key, value) {
+        double sum = MED.values
+            .fold(0, (previousValue, element) => previousValue + element);
+        double result = ((value / sum) * 100);
+        String formattedNumber = result.toStringAsFixed(2);
+        result = double.parse(formattedNumber);
+        PieChartSectionData temp = PieChartSectionData(
+          showTitle: true,
+          value: result,
+          color: primaryColors[color_indx],
+          title: '${result}% ${key}',
+          radius: 80,
+          titleStyle: TextStyle(
+              fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
+        );
+        color_indx++;
+        bie_data.add(temp);
+      },
+    );
+    return bie_data;
+  }
+
+  model buttomBar = new model();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: buttomBar.buttomAppBar_app(context),
       appBar: AppBar(
-        title: Text('Combined Charts Example'),
+        backgroundColor: _Colors['orange'],
+        title: Text('Statistics and analytics'),
       ),
       body: StreamBuilder<QuerySnapshot>(
           stream: _firestore
@@ -91,228 +186,139 @@ class _graphsState extends State<graphs> {
               }
             });
             print("ml====");
-            print(ml_med);
-            print("mg====");
-            print(mg_med);
-// List<int> pillAmountList =
-            // medicineData.map<int>((medicine) => medicine['pillAmount']).toList();
-            final List<double> barChartData_ml = ml_med
-                .map<double>((medicine) => double.parse(medicine['pillAmount']))
-                .toList();
-            final List<double> barChartData_mg = mg_med
-                .map<double>(
-                    (medicine) => double.parse(medicine['pillAmount']) / 1000)
-                .toList();
+            Map ML_MED = get_right_data_plus_sum(ml_med);
+            print(ML_MED);
+            Map MG_MED = get_right_data_plus_sum(mg_med);
 
-            return Padding(
+            print("mg====");
+            print(MG_MED);
+
+            final List<double> barChartData_ml =
+                ML_MED.values.toList() as List<double>;
+            final List<double> barChartData_mg =
+                MG_MED.values.toList() as List<double>;
+
+            print("bie_data_ml");
+
+            return Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
               padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Text(widget.meds.toString()),
-                  Expanded(
-                    flex: 1,
-                    child: BarChart(
-                      BarChartData(
-                        alignment: BarChartAlignment.spaceAround,
-                        maxY: 1000,
-                        barTouchData: BarTouchData(enabled: false),
-                        titlesData: FlTitlesData(
-                          leftTitles: SideTitles(
-                            showTitles: true,
-                            getTextStyles: (value) => const TextStyle(
-                                color: Colors.blueGrey, fontSize: 10),
-                            getTitles: (value) {
-                              return value.toInt().toString();
-                            },
-                            margin: 8,
-                            reservedSize: 30,
-                          ),
-                          bottomTitles: SideTitles(
-                            showTitles: true,
-                            getTextStyles: (value) => const TextStyle(
-                                color: Colors.blueGrey, fontSize: 10),
-                            getTitles: (value) {
-                              switch (value.toInt()) {
-                                case 0:
-                                  return 'A';
-                                case 1:
-                                  return 'B';
-                                case 2:
-                                  return 'C';
-                                case 3:
-                                  return 'D';
-                                case 4:
-                                  return 'E';
-                                case 5:
-                                  return 'F';
-                                default:
-                                  return '';
-                              }
-                            },
-                          ),
+              child: Expanded(
+                child: SingleChildScrollView(
+                  child: Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Text(widget.meds.toString()),
+                        SizedBox(
+                          height: 10,
                         ),
-                        gridData: FlGridData(show: false),
-                        borderData: FlBorderData(show: false),
-                        barGroups: barChartData_ml
-                            .asMap()
-                            .map(
-                              (index, value) => MapEntry(
-                                index,
-                                BarChartGroupData(
-                                  x: index,
-                                  barRods: [
-                                    BarChartRodData(
-                                      y: value,
-                                      colors: [Colors.blue],
-                                    ),
-                                  ],
+                        Text(
+                          "Bar Chart",
+                          style: TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.bold),
+                        ),
+                        Text("To show",
+                            style: TextStyle(
+                                color: Colors.black38,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold)),
+                        Text("the consumption of medicine in milliliters (ml)"),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        virtical_chart(ML_MED, barChartData_ml),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          "Bar Chart",
+                          style: TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.bold),
+                        ),
+                        Text("To show",
+                            style: TextStyle(
+                                color: Colors.black38,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold)),
+                        Text("the consumption of medicine in milligrams (mg)"),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        virtical_chart(MG_MED, barChartData_mg),
+                        SizedBox(
+                          height: 50,
+                        ),
+                        Column(
+                          children: [
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              "Pie Chart",
+                              style: TextStyle(
+                                  fontSize: 30, fontWeight: FontWeight.bold),
+                            ),
+                            Text("To show",
+                                style: TextStyle(
+                                    color: Colors.black38,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold)),
+                            Text(
+                                "the Percentage of medicines in milliliters (ml)"),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              height: 250,
+                              child: PieChart(
+                                PieChartData(
+                                  sections: bie_data_func(ML_MED),
+                                  borderData: FlBorderData(show: false),
+                                  centerSpaceRadius: 30,
+                                  sectionsSpace: 0,
                                 ),
                               ),
-                            )
-                            .values
-                            .toList(),
-                      ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          "Pie Chart",
+                          style: TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.bold),
+                        ),
+                        Text("To show",
+                            style: TextStyle(
+                                color: Colors.black38,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold)),
+                        Text("the Percentage of medicines in milliliters (ml)"),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          height: 250,
+                          child: PieChart(
+                            PieChartData(
+                              sections: bie_data_func(MG_MED),
+                              borderData: FlBorderData(show: false),
+                              centerSpaceRadius: 30,
+                              sectionsSpace: 0,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: PieChart(
-                      PieChartData(
-                        sections: pieChartData,
-                        borderData: FlBorderData(show: false),
-                        centerSpaceRadius: 30,
-                        sectionsSpace: 0,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             );
           }),
-    );
-  }
-}
-
-class CombinedChartsExample extends StatelessWidget {
-  final List<double> barChartData = [5, 10, 8, 12, 6, 15];
-  final List<PieChartSectionData> pieChartData = [
-    PieChartSectionData(
-      value: 30,
-      color: Colors.red,
-      title: '30%',
-      radius: 30,
-      titleStyle: TextStyle(
-          fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-    ),
-    PieChartSectionData(
-      value: 40,
-      color: Colors.green,
-      title: '40%',
-      radius: 30,
-      titleStyle: TextStyle(
-          fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-    ),
-    PieChartSectionData(
-      value: 30,
-      color: Colors.blue,
-      title: '30%',
-      radius: 30,
-      titleStyle: TextStyle(
-          fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Combined Charts Example'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 1,
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  maxY: 20,
-                  barTouchData: BarTouchData(enabled: false),
-                  titlesData: FlTitlesData(
-                    leftTitles: SideTitles(
-                      showTitles: true,
-                      getTextStyles: (value) =>
-                          const TextStyle(color: Colors.blueGrey, fontSize: 10),
-                      getTitles: (value) {
-                        return value.toInt().toString();
-                      },
-                      margin: 8,
-                      reservedSize: 30,
-                    ),
-                    bottomTitles: SideTitles(
-                      showTitles: true,
-                      getTextStyles: (value) =>
-                          const TextStyle(color: Colors.blueGrey, fontSize: 10),
-                      getTitles: (value) {
-                        switch (value.toInt()) {
-                          case 0:
-                            return 'A';
-                          case 1:
-                            return 'B';
-                          case 2:
-                            return 'C';
-                          case 3:
-                            return 'D';
-                          case 4:
-                            return 'E';
-                          case 5:
-                            return 'F';
-                          default:
-                            return '';
-                        }
-                      },
-                    ),
-                  ),
-                  gridData: FlGridData(show: false),
-                  borderData: FlBorderData(show: false),
-                  barGroups: barChartData
-                      .asMap()
-                      .map(
-                        (index, value) => MapEntry(
-                          index,
-                          BarChartGroupData(
-                            x: index,
-                            barRods: [
-                              BarChartRodData(
-                                y: value,
-                                colors: [Colors.blue],
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                      .values
-                      .toList(),
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: PieChart(
-                PieChartData(
-                  sections: pieChartData,
-                  borderData: FlBorderData(show: false),
-                  centerSpaceRadius: 30,
-                  sectionsSpace: 0,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
