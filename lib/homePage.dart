@@ -324,7 +324,7 @@ class _HomePageState extends State<HomePage> {
                 color: _Colors['blue'],
               ),
               onPressed: () {
-                scheduleReminder();
+                Navigator.pushNamed(context, 'history');
               },
             ),
             SizedBox(

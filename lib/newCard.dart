@@ -49,6 +49,7 @@ class _newCardState extends State<newCard> {
           Expanded(
             child: GestureDetector(
               onDoubleTap: () {
+                DateTime now = DateTime.now();
                 setState(() {
                   if (taked == true) {
                     print(widget.dataOfPill);
@@ -81,7 +82,8 @@ class _newCardState extends State<newCard> {
                       'pillType': widget.dataOfPill['pillType'].toString(),
                       'pillWeek': widget.dataOfPill['pillWeek'].toString(),
                       'medDate': widget.dataOfPill['medDate'].toString(),
-                      'taked': taked
+                      'taked': taked,
+                      'takedAt': DateFormat.Hm().format(now)
                     };
 
                     _firestore
