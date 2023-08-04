@@ -1,16 +1,54 @@
-# medtrack
+# MedTrack - Flutter Application
 
-Medication Tracker and Reminder App
+The Medicines App is a user-friendly Flutter application designed to help you manage your medications efficiently. With this app, you can save your medicines and receive timely reminders to take them, ensuring you never miss a dose. The app offers several useful features to streamline your medication management process.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+To get started with the Medicines App, you can refer to the online documentation provided by Flutter. The documentation contains tutorials, samples, and comprehensive guidance on mobile development, along with a full API reference. Visit [Flutter Documentation](https://flutter.dev/docs) for detailed instructions.
 
-A few resources to get you started if this is your first Flutter project:
+## App Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+The Medicines App boasts the following features:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Save Medicines
+
+Easily save your medicines in the app's local database. You can input details such as medicine name, dosage, and frequency.
+
+### Daily Medicines Display
+
+The app conveniently displays all your scheduled medicines for each day, making it simple to keep track of your daily medication routine.
+
+### Timely Reminders
+
+Never miss a dose again! The Medicines App sends you notifications at the correct time to remind you to take your medicines.
+
+### Delete Medicines
+
+If you no longer need a particular medicine or have finished a course, you can effortlessly delete it from the app.
+
+### Medicines History
+
+The app maintains a history of taken medicines, allowing you to review your medication adherence and track your progress over time.
+
+### Statistics and Analytics
+
+Get insights into your medication habits with comprehensive statistics and analytics. The app provides visual representations of your medication adherence and usage patterns.
+
+### Quick SOS Button
+
+In case of emergencies, the app includes a quick SOS button that provides instant access to critical information or emergency contacts.
+
+The Medicines App aims to be your reliable partner in managing your medications, ensuring you stay on track with your treatment plans and maintain your well-being.
+
+
+### Screenshots :
+
+<img src= "screenShots/1.png"  width="40%">
+<img src= "screenShots/2.png"  width="40%">
+<img src= "screenShots/3.png"  width="40%">
+<img src= "screenShots/4.png"  width="40%">
+<img src= "screenShots/5.png"  width="40%">
+<img src= "screenShots/6.png"  width="40%">
+<img src= "screenShots/7.png"  width="40%">
+<img src= "screenShots/8.png"  width="40%">
+<img src= "screenShots/9.png"  width="40%">
