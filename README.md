@@ -43,12 +43,12 @@ The Medicines App aims to be your reliable partner in managing your medications,
 
 ### Screenshots :
 
-<img src= "screenShots/1.png"  width="40%">
-<img src= "screenShots/2.png"  width="40%">
-<img src= "screenShots/3.png"  width="40%">
-<img src= "screenShots/4.png"  width="40%">
-<img src= "screenShots/5.png"  width="40%">
-<img src= "screenShots/6.png"  width="40%">
-<img src= "screenShots/7.png"  width="40%">
-<img src= "screenShots/8.png"  width="40%">
-<img src= "screenShots/9.png"  width="40%">
+<img src= "screenShots/1.jpg"  width="40%">
+<img src= "screenShots/2.jpg"  width="40%">
+<img src= "screenShots/3.jpg"  width="40%">
+<img src= "screenShots/4.jpg"  width="40%">
+<img src= "screenShots/5.jpg"  width="40%">
+<img src= "screenShots/6.jpg"  width="40%">
+<img src= "screenShots/7.jpg"  width="40%">
+<img src= "screenShots/8.jpg"  width="40%">
+<img src= "screenShots/9.jpg"  width="40%">
